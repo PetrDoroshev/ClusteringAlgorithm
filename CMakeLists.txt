@@ -4,4 +4,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 project ("CluseringAlgorithm")
 
-add_executable(CluseringAlgorithm src/main.cpp)
+add_executable(CluseringAlgorithm src/main.cpp 
+                                  src/dendrogram/Dendrogram.h 
+                                  src/dendrogram/Node.h)
