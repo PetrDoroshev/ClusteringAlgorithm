@@ -3,7 +3,7 @@
 
 #include "DistanceMetric.h"
 
-class EuclideanMetric: public DistanceMetric{
+class EuclideanDistance: public DistanceMetric{
 
 public:
     virtual double operator() (const DataPoint& point_1, const DataPoint& point_2) override;
