@@ -3,10 +3,10 @@
 
 #include "DistanceMetric.h"
 
-class EuclideanDistance: public DistanceMetric{
+class EuclideanDistance: public DistanceMetric {
 
 public:
-    virtual double operator() (const DataPoint& point_1, const DataPoint& point_2) override;
+    virtual double operator() (const DataPoint& point_1, const DataPoint& point_2) const override;
 
 };
 

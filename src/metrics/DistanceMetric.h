@@ -7,10 +7,10 @@ class DistanceMetric {
 
 public:
 
-    virtual ~DistanceMetric() = 0;
+    virtual ~DistanceMetric() = default;
     DistanceMetric() = default;
 
-    virtual double operator() (const DataPoint& point_1, const DataPoint& point_2) = 0;
+    virtual double operator() (const DataPoint& point_1, const DataPoint& point_2) const = 0;
 
 };
 
