@@ -2,12 +2,13 @@
 #define EUCLIDEAN_METRIC_H
 
 #include "DistanceMetric.h"
+#include <cmath>
+#include <stdexcept>
 
 class EuclideanDistance: public DistanceMetric {
 
 public:
     virtual double operator() (const DataPoint& point_1, const DataPoint& point_2) const override;
-
 };
 
 
