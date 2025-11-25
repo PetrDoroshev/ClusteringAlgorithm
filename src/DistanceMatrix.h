@@ -2,7 +2,32 @@
 #define DISTANCE_MATRIX_H
 
 #include <unordered_map>
+#include <vector>
+#include <stdexcept>
+#include <limits>
+#include <iomanip>
+#include <iostream>
 
-using DistanceMatrix = std::unordered_map<size_t, std::unordered_map<size_t, double>>;
+
+class DistanceMatrix {
+
+public:
+
+    DistanceMatrix(size_t n);
+    DistanceMatrix(const std::vector<std::vector<double>>& data);
+    DistanceMatrix() = default;
+
+    double Get(size_t i, size_t k) const;
+    void Set(size_t i, size_t k, double val);
+    size_t GetDim() const;
+
+    void Print() const;
+
+private:
+
+    size_t N;
+    std::vector<std::vector<double>> data;
+
+};
 
 #endif
