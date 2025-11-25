@@ -12,5 +12,10 @@ add_executable(CluseringAlgorithm src/main.cpp
                                   src/metrics/EuclideanDistance.h
                                   src/metrics/EuclideanDistance.cpp
                                   src/linkage/LinkageStrategy.h
-                                  src/clustering/ClusteringAlgorithm.h
-                                  src/DistanceMatrix.h)
+                                  src/linkage/WPGMA.cpp
+                                  src/clustering/HierarchicalClustering.h
+                                  src/clustering/HierarchicalClustering.cpp
+                                  src/DistanceMatrix.h
+                                  src/DistanceMatrix.cpp
+                                  src/DataPoint.h
+                                  src/DataPoint.cpp)

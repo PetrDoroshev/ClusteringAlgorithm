@@ -53,6 +53,13 @@
         "text_encoding": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
-    }
+        "variant": "cpp",
+        "cstdarg": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "stdfloat": "cpp",
+        "stack": "cpp",
+        "iomanip": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
