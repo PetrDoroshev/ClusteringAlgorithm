@@ -16,5 +16,5 @@ add_library(ClusteringAlgorithm STATIC src/metrics/EuclideanDistance.cpp
 set_target_properties(ClusteringAlgorithm PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
-pybind11_add_module(module src/main.cpp)
-target_link_libraries(module PRIVATE ClusteringAlgorithm)
+pybind11_add_module(clustering src/main.cpp)
+target_link_libraries(clustering PRIVATE ClusteringAlgorithm)
