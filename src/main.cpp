@@ -10,6 +10,9 @@
 #include "linkage/WPGMA.h"
 #include "metrics/EuclideanDistance.h"
 
+PYBIND11_MODULE(module, m) {
+};
+
 std::vector<DataPoint> generateData(size_t N, size_t count, double spread);
 
 int main () {
