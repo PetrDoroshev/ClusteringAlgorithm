@@ -15,4 +15,4 @@ double EuclideanDistance::operator() (const DataPoint& point_1, const DataPoint&
 
     return sqrt(sum);
 
-}
+};

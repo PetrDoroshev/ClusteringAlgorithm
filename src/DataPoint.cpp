@@ -26,7 +26,7 @@ DataPoint DataPoint::operator- (const DataPoint& rhs) const {
         
     return DataPoint(d);
     
-}
+};
 
 DataPoint DataPoint::operator* (int number) const {
     
@@ -37,10 +37,10 @@ DataPoint DataPoint::operator* (int number) const {
     }
         
     return DataPoint(d);
-}
+};
 
 double DataPoint::operator[] (size_t index) const {
 
     return data[index];
-}
+};
 

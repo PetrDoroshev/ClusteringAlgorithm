@@ -28,14 +28,14 @@ HClustering::HClustering(const std::vector<DataPoint>& dataset, MetricType dista
             std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0})
         
         }));*/
-}
+};
 
 void HClustering::setDataset(const std::vector<DataPoint>& dataset) {
     
     this->dataset = dataset;
     
     initDistanceMatrix();
-}
+};
 
 void HClustering::initDistanceMatrix() {
 
@@ -46,7 +46,7 @@ void HClustering::initDistanceMatrix() {
             DM.Set(i, k, (*distanceMetric)(dataset[i], dataset[k]));
         }
     }
-}
+};
 
 void HClustering::Fit() {
     
@@ -78,7 +78,7 @@ void HClustering::Fit() {
         std::cout << lt.left << ", " << lt.right << ", " << lt.distance << ", " << lt.size << '\n';
     }
 
-}
+};
 
 std::vector<LinkageTriplet> HClustering::nnChain() {
 
@@ -174,4 +174,4 @@ std::vector<LinkageTriplet> HClustering::nnChain() {
     }
 
     return L;
-}
+};

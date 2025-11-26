@@ -7,11 +7,11 @@ DistanceMatrix::DistanceMatrix(size_t n): N(n) {
     for (auto& v: data) {
         v = std::vector<double>(N, 0.0);
     }
-}
+};
 
 DistanceMatrix::DistanceMatrix(const std::vector<std::vector<double>>& data): N(data.size()), data(data) {
 
-}
+};
 
 double DistanceMatrix::Get(size_t i, size_t k) const {
     
@@ -24,7 +24,7 @@ double DistanceMatrix::Get(size_t i, size_t k) const {
     }
 
     return data[i][k];
-}
+};
 
 void DistanceMatrix::Set(size_t i, size_t k, double val) {
 
@@ -37,11 +37,11 @@ void DistanceMatrix::Set(size_t i, size_t k, double val) {
     }
 
     data[i][k] = val;
-}
+};
 
 size_t DistanceMatrix::GetDim() const {
     return N;
-}
+};
 
 void DistanceMatrix::Print() const {
 
@@ -51,4 +51,4 @@ void DistanceMatrix::Print() const {
         }
         std::cout << "\n";
     }
-}
+};

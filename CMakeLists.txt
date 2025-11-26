@@ -6,8 +6,7 @@ project ("ClusteringAlgorithm")
 
 find_package(pybind11 REQUIRED)
 
-add_library(ClusteringAlgorithm STATIC src/dendrogram/Node.cpp
-                                       src/metrics/EuclideanDistance.cpp
+add_library(ClusteringAlgorithm STATIC src/metrics/EuclideanDistance.cpp
                                        src/linkage/WPGMA.cpp
                                        src/clustering/HierarchicalClustering.cpp
                                        src/DistanceMatrix.cpp
