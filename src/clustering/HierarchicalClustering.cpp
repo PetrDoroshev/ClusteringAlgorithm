@@ -52,7 +52,7 @@ void HClustering::Fit() {
     
     auto L = nnChain();
 
-    std::vector<LinkageTriplet> nL;
+    std::vector<LinkageRow> nL;
     
     std::stable_sort(L.begin(), L.end(), [](auto& a, auto& b) {
 
@@ -80,12 +80,12 @@ void HClustering::Fit() {
 
 };
 
-std::vector<LinkageTriplet> HClustering::nnChain() {
+std::vector<LinkageRow> HClustering::nnChain() {
 
     size_t next_label = dataset.size();
     int order_counter = 0;
 
-    std::vector<LinkageTriplet> L;
+    std::vector<LinkageRow> L;
 
     std::vector<size_t> chain;
     chain.reserve(2 * dataset.size());

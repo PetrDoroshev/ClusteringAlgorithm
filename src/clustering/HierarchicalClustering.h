@@ -12,7 +12,7 @@
 #include "../linkage/WPGMA.h"
 #include "../metrics/DistanceMetric.h"
 #include "../metrics/EuclideanDistance.h"
-#include "../LinkageTriplet.h"
+#include "../LinkageRow.h"
 #include "../UnionFind.h"
 
 enum class MetricType {
@@ -52,7 +52,7 @@ private:
     DistanceMatrix DM;
 
     void initDistanceMatrix();
-    std::vector<LinkageTriplet> nnChain();
+    std::vector<LinkageRow> nnChain();
 };
 
 #endif
