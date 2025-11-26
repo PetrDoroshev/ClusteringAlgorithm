@@ -2,20 +2,20 @@ cmake_minimum_required (VERSION 3.15)
 
 set(CMAKE_CXX_STANDARD 20)
 
-project ("CluseringAlgorithm")
+project ("ClusteringAlgorithm")
 
-add_executable(CluseringAlgorithm src/main.cpp 
-                                  src/dendrogram/Dendrogram.h 
-                                  src/dendrogram/Node.h
-                                  src/dendrogram/Node.cpp
-                                  src/metrics/DistanceMetric.h
-                                  src/metrics/EuclideanDistance.h
-                                  src/metrics/EuclideanDistance.cpp
-                                  src/linkage/LinkageStrategy.h
-                                  src/linkage/WPGMA.cpp
-                                  src/clustering/HierarchicalClustering.h
-                                  src/clustering/HierarchicalClustering.cpp
-                                  src/DistanceMatrix.h
-                                  src/DistanceMatrix.cpp
-                                  src/DataPoint.h
-                                  src/DataPoint.cpp)
+find_package(pybind11 REQUIRED)
+
+add_library(ClusteringAlgorithm STATIC src/dendrogram/Node.cpp
+                                       src/metrics/EuclideanDistance.cpp
+                                       src/linkage/WPGMA.cpp
+                                       src/clustering/HierarchicalClustering.cpp
+                                       src/DistanceMatrix.cpp
+                                       src/DataPoint.cpp
+                                       src/UnionFind.cpp)
+
+set_target_properties(ClusteringAlgorithm PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+
+pybind11_add_module(module src/main.cpp)
+target_link_libraries(module PRIVATE ClusteringAlgorithm)

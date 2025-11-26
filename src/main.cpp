@@ -4,32 +4,35 @@
 #include <vector>
 #include <random>
 #include <cmath>
+#include <pybind11/pybind11.h>
 #include "DataPoint.h"
 #include "clustering/HierarchicalClustering.h"
 #include "linkage/WPGMA.h"
 #include "metrics/EuclideanDistance.h"
 
+std::vector<DataPoint> generateData(size_t N, size_t count, double spread);
+
 int main () {
+    
+    return 0;
+}
 
-    size_t N = 3;
-    size_t count = 10;
-    double spread = 0.3;
-
+std::vector<DataPoint> generateData(size_t N, size_t count, double spread) {
+    
     std::vector<DataPoint> pts;
     pts.reserve(count);
 
     std::mt19937 rng(42);
     std::normal_distribution<double> noise(0.0, spread);
 
-    // Сгенерируем центры кластеров
     std::vector<std::vector<double>> centers = {
-        std::vector<double>(N, 0.0),   // центр 1: (0,0,...)
-        std::vector<double>(N, 3.0),   // центр 2: (3,3,...)
-        std::vector<double>(N, -3.0)   // центр 3: (-3,-3,...)
+        std::vector<double>(N, 0.0),  
+        std::vector<double>(N, 3.0),   
+        std::vector<double>(N, -3.0)   
     };
 
     for (size_t i = 0; i < count; i++) {
-        const auto& C = centers[i % centers.size()]; // круглое распределение по центрам
+        const auto& C = centers[i % centers.size()]; 
         std::vector<double> v(N);
         for (size_t d = 0; d < N; d++) {
             v[d] = C[d] + noise(rng);
@@ -37,12 +40,5 @@ int main () {
         pts.emplace_back(v);
     }
 
-    auto dm = std::shared_ptr<DistanceMetric>(new EuclideanDistance);
-    auto ls = std::shared_ptr<LinkageStrategy>(new WPGMA);
-
-    auto hc = HClustering(pts, dm, ls);
-    
-    hc.Fit();
-    
-    return 0;
+    return pts;
 }

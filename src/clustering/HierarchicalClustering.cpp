@@ -1,10 +1,11 @@
 #include "HierarchicalClustering.h"
 
 
-HClustering::HClustering(const std::vector<DataPoint>& dataset, 
-                         std::shared_ptr<DistanceMetric> distance_metric, std::shared_ptr<LinkageStrategy> linkage_strategy): 
+HClustering::HClustering(const std::vector<DataPoint>& dataset, MetricType distance_metric, LinkageType linkage_strategy): 
     
-    dataset(dataset), distanceMetric(distance_metric), linkageStrategy(linkage_strategy) {
+    dataset(dataset), 
+    distanceMetric(metricMap[distance_metric]), 
+    linkageStrategy(linkageMap[linkage_strategy]) {
 
         
         initDistanceMatrix();
@@ -13,6 +14,20 @@ HClustering::HClustering(const std::vector<DataPoint>& dataset,
         for (size_t i = 0; i < dataset.size(); ++i) {
             clusterSize[i] = 1;
         }
+        /*
+        DM = DistanceMatrix(std::vector<std::vector<double>>({
+
+            std::vector<double>({0, 17, 21, 31, 23, 0, 0, 0, 0}),
+            std::vector<double>({0, 0,  30, 35, 21, 0, 0, 0, 0}),
+            std::vector<double>({0, 0,  0,  28, 39, 0 ,0, 0, 0}),
+            std::vector<double>({0, 0,  0,  0,  43, 0, 0, 0, 0}),
+            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
+            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
+            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
+            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
+            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0})
+        
+        }));*/
 }
 
 void HClustering::setDataset(const std::vector<DataPoint>& dataset) {
@@ -34,18 +49,44 @@ void HClustering::initDistanceMatrix() {
 }
 
 void HClustering::Fit() {
+    
     auto L = nnChain();
 
+    std::vector<LinkageTriplet> nL;
+    
+    std::stable_sort(L.begin(), L.end(), [](auto& a, auto& b) {
+
+        if (a.distance != b.distance) {
+           return a.distance < b.distance;
+        }
+        return a.order < b.order;
+    });
+
     for (auto lt: L) {
-        std::cout << lt.left << ", " << lt.right << ", " << lt.distance << '\n';
+        std::cout << lt.left << ", " << lt.right << ", " << lt.distance << ", " << lt.size << '\n';
     }
+    std::cout << std::endl;
+
+    auto U = UnionFind(L.size() + 1);
+    
+    for (auto& [a, b, d, order, size]: L) {
+        nL.push_back({U.Find(a), U.Find(b), d, order, size});
+        U.Union(a, b);
+    }
+
+    for (auto lt: nL) {
+        std::cout << lt.left << ", " << lt.right << ", " << lt.distance << ", " << lt.size << '\n';
+    }
+
 }
 
 std::vector<LinkageTriplet> HClustering::nnChain() {
 
     size_t next_label = dataset.size();
+    int order_counter = 0;
 
     std::vector<LinkageTriplet> L;
+
     std::vector<size_t> chain;
     chain.reserve(2 * dataset.size());
     
@@ -90,25 +131,31 @@ std::vector<LinkageTriplet> HClustering::nnChain() {
             
         }
         else {
+            
             chain.erase(chain.end() - 3, chain.end());
         }
 
         while (true) {
 
             auto nn = getNN(chain.back(), 
-                            chain.size() >= 2 ? *(chain.end() - 2) : std::numeric_limits<size_t>::max()
-                           );
+                            chain.size() >= 2 ? *(chain.end() - 2) : std::numeric_limits<size_t>::max());
             
             chain.push_back(nn);
 
             if (chain.size() >= 3 && *(chain.end() - 3) == nn) {
 
+                size_t new_node = next_label++;
+
                 auto merged_node_1 = nn;
                 auto merged_node_2 = *(chain.end() - 2);
 
+                clusterSize[new_node] = clusterSize[merged_node_1] + clusterSize[merged_node_2];
+
                 L.push_back({merged_node_1, 
                              merged_node_2, 
-                             DM.Get(merged_node_1, merged_node_2)
+                             DM.Get(merged_node_1, merged_node_2),
+                             order_counter++,
+                             clusterSize[new_node]
                             });
 
                 removed[merged_node_1] = removed[merged_node_2] = 1;
@@ -117,9 +164,7 @@ std::vector<LinkageTriplet> HClustering::nnChain() {
                 for (int v: active) if (!removed[v] && v!=merged_node_1 && v!=merged_node_2) na.push_back(v);
                 active.swap(na);
                 
-                size_t new_node = next_label++;
                 active.push_back(new_node);
-                clusterSize[new_node] = clusterSize[merged_node_1] + clusterSize[merged_node_2];
                           
                 linkageStrategy->UpdateDistance(new_node, merged_node_1, merged_node_2, DM);
                 

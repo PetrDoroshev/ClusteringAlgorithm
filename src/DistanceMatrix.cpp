@@ -5,7 +5,7 @@ DistanceMatrix::DistanceMatrix(size_t n): N(n) {
     data = std::vector<std::vector<double>>(N, std::vector<double>());
 
     for (auto& v: data) {
-        v = std::vector(N, 0.0);
+        v = std::vector<double>(N, 0.0);
     }
 }
 
