@@ -62,10 +62,19 @@ std::vector<std::tuple<size_t, size_t, double, int>> HClustering::Fit() {
 
     std::cout << "\n";
     for (auto& [a, b, d, size]: L) {
-        linkage_matrix.push_back({U.Find(a), U.Find(b), d, size});
+
+        a = U.Find(a);
+        b = U.Find(b);
+
+        if (a > b) 
+            std::swap(a, b);
+
+        linkage_matrix.push_back({a, b, d, size});
         U.Union(a, b);
-        
-        //std::cout << a << ", " << b << ", " << order << "\n";
+    }
+
+    for (auto&[a, b, d, size]: linkage_matrix) {
+         std::cout << a << ", " << b << ", " << d << "\n";
     }
 
     return linkage_matrix;
@@ -74,8 +83,7 @@ std::vector<std::tuple<size_t, size_t, double, int>> HClustering::Fit() {
 std::vector<LinkageRow> HClustering::nnChain() {
 
     const size_t N = dataset.size();
-    size_t next_label = N;
-
+    
     size_t x = 0;
     size_t y = 0;
     
@@ -85,14 +93,14 @@ std::vector<LinkageRow> HClustering::nnChain() {
     std::vector<size_t> chain;
     chain.reserve(2 * N);
 
-    std::vector<bool> active(2 * N, false);
+    std::vector<bool> active(N, false);
     for (size_t i = 0; i < N; ++i) {
         active[i] = true;
     }
     
 
     auto getNN = [&](size_t node, std::optional<size_t> preferable) -> size_t {
-        
+
         double min_dist = std::numeric_limits<double>::max();
         size_t nn = 0;
     
@@ -122,7 +130,7 @@ std::vector<LinkageRow> HClustering::nnChain() {
 
         if (chain.empty()) {
 
-            for (size_t i = 0; i < next_label; ++i) {
+            for (size_t i = 0; i < N; ++i) {
                 
                 if (active[i]) {
                     chain.push_back(i);
@@ -144,16 +152,13 @@ std::vector<LinkageRow> HClustering::nnChain() {
             chain.push_back(y);
         }
 
-        auto new_node = next_label++;
-
-        if (x > y) {
+        if (x > y) 
             std::swap(x, y);
-        }
+        
+        auto new_node = y;
 
         active[x] = false;
-        active[y] = false;
-        active[new_node] = true;
-
+       
         L.push_back({
             x,
             y,
@@ -161,9 +166,9 @@ std::vector<LinkageRow> HClustering::nnChain() {
             clusterSize[new_node] = clusterSize[x] + clusterSize[y]
         });
 
-        for (size_t i = 0; i < new_node; ++i) {
+        for (size_t i = 0; i < N; ++i) {
             
-            if (active[i]) {
+            if (active[i] && i != new_node) {
                 
                 linkageStrategy->UpdateDistance(new_node, x, y, i, DM);
             }
