@@ -1,16 +1,16 @@
 #include <iostream>
 #include "DistanceMatrix.h"
 #include <vector>
-#include <random>
-#include <cmath>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "DataPoint.h"
+#include "GenerateData.h"
 #include "clustering/HierarchicalClustering.h"
 #include "linkage/WPGMA.h"
 #include "metrics/EuclideanDistance.h"
 
 namespace py = pybind11;
+
 
 void bind_datapoint(py::module_& m) {
 
@@ -20,6 +20,7 @@ void bind_datapoint(py::module_& m) {
 
        
         .def("get_dim", &DataPoint::GetDim)
+        .def("get_data", &DataPoint::GetData)
 
         .def("__add__", &DataPoint::operator+)
         .def("__sub__", &DataPoint::operator-)
@@ -65,12 +66,12 @@ class PyLinkageStrategy : public LinkageStrategy {
 public:
     using LinkageStrategy::LinkageStrategy;
 
-    void UpdateDistance(size_t new_node, size_t m1, size_t m2, DistanceMatrix& DM) const override {
+    void UpdateDistance(size_t new_node, size_t m1, size_t m2, size_t i, DistanceMatrix& DM) const override {
         PYBIND11_OVERRIDE_PURE(
             void,
             LinkageStrategy,
             UpdateDistance,
-            new_node, m1, m2, DM
+            new_node, m1, m2, i, DM
         );
     }
 };
@@ -96,8 +97,50 @@ void bind_distance_matrix(py::module_& m) {
         .def("get", &DistanceMatrix::Get)
         .def("set", &DistanceMatrix::Set)
         .def("get_dim", &DistanceMatrix::GetDim)
+        .def("get_data", &DistanceMatrix::GetData)
         .def("print", &DistanceMatrix::Print);
 };
+
+void bind_hclustering(py::module_& m) {
+
+    // --- Enum MetricType ---
+    py::enum_<MetricType>(m, "MetricType")
+        .value("EUCLIDEAN", MetricType::EUCLIDEAN);
+
+    // --- Enum LinkageType ---
+    py::enum_<LinkageType>(m, "LinkageType")
+        .value("WPGMA", LinkageType::WPGMA);
+
+    // --- Основной класс ---
+    py::class_<HClustering>(m, "HClustering")
+        .def(
+            py::init<
+                const std::vector<DataPoint>&,
+                MetricType,
+                LinkageType
+            >(),
+            py::arg("dataset"),
+            py::arg("metric"),
+            py::arg("linkage")
+        )
+
+        // Fit() возвращает vector<tuple> → python list[list]
+        .def("fit", [](HClustering& self) {
+            auto result = self.Fit();
+
+            // Преобразуем tuple → python list
+            py::list py_result;
+            for (const auto& t : result) {
+                auto [a, b, c, d] = t;
+                py_result.append(py::make_tuple(a, b, c, d));
+            }
+            return py_result;
+        })
+
+        .def("set_dataset", &HClustering::setDataset)
+        .def("get_dm", &HClustering::getDM);
+
+}
 
 PYBIND11_MODULE(clustering, m) {
     
@@ -107,32 +150,15 @@ PYBIND11_MODULE(clustering, m) {
     bind_linkage_strategy(m);
     bind_wpgma(m);
     bind_distance_matrix(m);
+    bind_hclustering(m);
+
+    m.def(
+        "generate_data",
+        &generateData,                       
+        py::arg("dimensions"),
+        py::arg("count"),
+        py::arg("spread")
+    );
+
 };
 
-std::vector<DataPoint> generateData(size_t N, size_t count, double spread);
-
-std::vector<DataPoint> generateData(size_t N, size_t count, double spread) {
-    
-    std::vector<DataPoint> pts;
-    pts.reserve(count);
-
-    std::mt19937 rng(42);
-    std::normal_distribution<double> noise(0.0, spread);
-
-    std::vector<std::vector<double>> centers = {
-        std::vector<double>(N, 0.0),  
-        std::vector<double>(N, 3.0),   
-        std::vector<double>(N, -3.0)   
-    };
-
-    for (size_t i = 0; i < count; i++) {
-        const auto& C = centers[i % centers.size()]; 
-        std::vector<double> v(N);
-        for (size_t d = 0; d < N; d++) {
-            v[d] = C[d] + noise(rng);
-        }
-        pts.emplace_back(v);
-    }
-
-    return pts;
-}

@@ -12,6 +12,7 @@ public:
     DataPoint(const std::vector<double>& data): data(data) {};
 
     size_t GetDim() const;
+    std::vector<double> GetData() const;
 
     DataPoint operator+ (const DataPoint& rhs) const;
     DataPoint operator- (const DataPoint& rhs) const;

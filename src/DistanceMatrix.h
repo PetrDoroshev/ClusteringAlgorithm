@@ -20,6 +20,7 @@ public:
     double Get(size_t i, size_t k) const;
     void Set(size_t i, size_t k, double val);
     size_t GetDim() const;
+    std::vector<std::vector<double>> GetData() const;
 
     void Print() const;
 

@@ -5,6 +5,10 @@ size_t DataPoint::GetDim() const {
     return data.size();
 };
 
+std::vector<double> DataPoint::GetData() const {
+    return data;
+}
+
 DataPoint DataPoint::operator+ (const DataPoint& rhs) const {
 
     std::vector<double> d(data.begin(), data.end());

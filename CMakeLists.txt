@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 project ("ClusteringAlgorithm")
 
+add_subdirectory("./cli")
+
 find_package(pybind11 REQUIRED)
 
 add_library(ClusteringAlgorithm STATIC src/metrics/EuclideanDistance.cpp

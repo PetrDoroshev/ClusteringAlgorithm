@@ -14,20 +14,6 @@ HClustering::HClustering(const std::vector<DataPoint>& dataset, MetricType dista
         for (size_t i = 0; i < dataset.size(); ++i) {
             clusterSize[i] = 1;
         }
-        /*
-        DM = DistanceMatrix(std::vector<std::vector<double>>({
-
-            std::vector<double>({0, 17, 21, 31, 23, 0, 0, 0, 0}),
-            std::vector<double>({0, 0,  30, 35, 21, 0, 0, 0, 0}),
-            std::vector<double>({0, 0,  0,  28, 39, 0 ,0, 0, 0}),
-            std::vector<double>({0, 0,  0,  0,  43, 0, 0, 0, 0}),
-            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
-            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
-            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
-            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0}),
-            std::vector<double>({0, 0,  0,  0,  0,  0, 0, 0, 0})
-        
-        }));*/
 };
 
 void HClustering::setDataset(const std::vector<DataPoint>& dataset) {
@@ -36,6 +22,10 @@ void HClustering::setDataset(const std::vector<DataPoint>& dataset) {
     
     initDistanceMatrix();
 };
+
+DistanceMatrix HClustering::getDM() const {
+    return DM;
+}
 
 void HClustering::initDistanceMatrix() {
 
@@ -46,65 +36,75 @@ void HClustering::initDistanceMatrix() {
             DM.Set(i, k, (*distanceMetric)(dataset[i], dataset[k]));
         }
     }
+
 };
 
-void HClustering::Fit() {
+std::vector<std::tuple<size_t, size_t, double, int>> HClustering::Fit() {
     
     auto L = nnChain();
 
-    std::vector<LinkageRow> nL;
-    
     std::stable_sort(L.begin(), L.end(), [](auto& a, auto& b) {
 
-        if (a.distance != b.distance) {
-           return a.distance < b.distance;
-        }
-        return a.order < b.order;
+        return a.distance < b.distance;
+        
     });
 
-    for (auto lt: L) {
-        std::cout << lt.left << ", " << lt.right << ", " << lt.distance << ", " << lt.size << '\n';
-    }
-    std::cout << std::endl;
-
     auto U = UnionFind(L.size() + 1);
-    
-    for (auto& [a, b, d, order, size]: L) {
-        nL.push_back({U.Find(a), U.Find(b), d, order, size});
+
+    std::vector<std::tuple<size_t, size_t, double, int>> linkage_matrix;
+    linkage_matrix.reserve(L.size());
+
+    /*
+    for (auto& r: L) {
+        std::cout << r.left << ", " << r.right << ", " << r.order << "\n";
+    }
+    */
+
+    std::cout << "\n";
+    for (auto& [a, b, d, size]: L) {
+        linkage_matrix.push_back({U.Find(a), U.Find(b), d, size});
         U.Union(a, b);
+        
+        //std::cout << a << ", " << b << ", " << order << "\n";
     }
 
-    for (auto lt: nL) {
-        std::cout << lt.left << ", " << lt.right << ", " << lt.distance << ", " << lt.size << '\n';
-    }
-
+    return linkage_matrix;
 };
 
 std::vector<LinkageRow> HClustering::nnChain() {
 
-    size_t next_label = dataset.size();
-    int order_counter = 0;
+    const size_t N = dataset.size();
+    size_t next_label = N;
 
-    std::vector<LinkageRow> L;
-
-    std::vector<size_t> chain;
-    chain.reserve(2 * dataset.size());
+    size_t x = 0;
+    size_t y = 0;
     
-    std::vector<size_t> removed(2 * dataset.size() - 1, 0);
+    std::vector<LinkageRow> L;
+    L.reserve(N - 1);
+    
+    std::vector<size_t> chain;
+    chain.reserve(2 * N);
 
-    std::vector<size_t> active(dataset.size(), 0);
-    for (size_t i = 0; i < active.size(); ++i) {
-        active[i] = i;
+    std::vector<bool> active(2 * N, false);
+    for (size_t i = 0; i < N; ++i) {
+        active[i] = true;
     }
+    
 
-    auto getNN = [&](size_t node, size_t preferable) -> size_t {
-
+    auto getNN = [&](size_t node, std::optional<size_t> preferable) -> size_t {
+        
         double min_dist = std::numeric_limits<double>::max();
         size_t nn = 0;
+    
+        if (preferable.has_value()) {
 
-        for (auto& n: active) {
+            min_dist = DM.Get(node, preferable.value());
+            nn = preferable.value();
+        }
+        
+        for (size_t n = 0; n < DM.GetDim(); ++n) {
 
-            if (!removed[n] && node != n) {
+            if (active[n] && node != n) {
                 
                 auto dist = DM.Get(node, n);
 
@@ -112,65 +112,65 @@ std::vector<LinkageRow> HClustering::nnChain() {
                     min_dist = dist;
                     nn = n;
                 }
-                else if (fabs(dist - min_dist) <= 1e-12 && n == preferable) {
-                    nn = preferable;
-                }
             }
         }
 
         return nn;
     };
 
-    while (active.size() > 1) {
+    for (size_t k = 0; k < N - 1; ++k) {
 
-        if (chain.size() <= 3) {
+        if (chain.empty()) {
 
-            chain.clear();
-            chain.push_back(active[0]);
-            chain.push_back(active[1]);
-            
-        }
-        else {
-            
-            chain.erase(chain.end() - 3, chain.end());
+            for (size_t i = 0; i < next_label; ++i) {
+                
+                if (active[i]) {
+                    chain.push_back(i);
+                    break;
+                }
+            }
+            if (chain.empty()) break; 
         }
 
         while (true) {
 
-            auto nn = getNN(chain.back(), 
-                            chain.size() >= 2 ? *(chain.end() - 2) : std::numeric_limits<size_t>::max());
-            
-            chain.push_back(nn);
+            x = chain.back();
+            y = getNN(x, chain.size() > 1 ? *(chain.end() - 2) : std::optional<size_t>());
 
-            if (chain.size() >= 3 && *(chain.end() - 3) == nn) {
-
-                size_t new_node = next_label++;
-
-                auto merged_node_1 = nn;
-                auto merged_node_2 = *(chain.end() - 2);
-
-                clusterSize[new_node] = clusterSize[merged_node_1] + clusterSize[merged_node_2];
-
-                L.push_back({merged_node_1, 
-                             merged_node_2, 
-                             DM.Get(merged_node_1, merged_node_2),
-                             order_counter++,
-                             clusterSize[new_node]
-                            });
-
-                removed[merged_node_1] = removed[merged_node_2] = 1;
-
-                std::vector<size_t> na;
-                for (int v: active) if (!removed[v] && v!=merged_node_1 && v!=merged_node_2) na.push_back(v);
-                active.swap(na);
-                
-                active.push_back(new_node);
-                          
-                linkageStrategy->UpdateDistance(new_node, merged_node_1, merged_node_2, DM);
-                
+            if (chain.size() > 1 && *(chain.end() - 2) == y) {
                 break;
             }
+
+            chain.push_back(y);
         }
+
+        auto new_node = next_label++;
+
+        if (x > y) {
+            std::swap(x, y);
+        }
+
+        active[x] = false;
+        active[y] = false;
+        active[new_node] = true;
+
+        L.push_back({
+            x,
+            y,
+            DM.Get(x, y),
+            clusterSize[new_node] = clusterSize[x] + clusterSize[y]
+        });
+
+        for (size_t i = 0; i < new_node; ++i) {
+            
+            if (active[i]) {
+                
+                linkageStrategy->UpdateDistance(new_node, x, y, i, DM);
+            }
+        }
+
+        chain.erase(chain.end() - 2, chain.end());
+
     }
 
     return L;

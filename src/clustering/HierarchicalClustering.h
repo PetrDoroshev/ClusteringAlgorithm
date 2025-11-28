@@ -29,8 +29,9 @@ public:
 
     HClustering(const std::vector<DataPoint>& dataset, MetricType distance_metric, LinkageType linkage_strategy);
 
-    void Fit();
+    std::vector<std::tuple<size_t, size_t, double, int>> Fit();
     void setDataset(const std::vector<DataPoint>& dataset);
+    DistanceMatrix getDM() const;
 
 private:
 

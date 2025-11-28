@@ -19,10 +19,6 @@ double DistanceMatrix::Get(size_t i, size_t k) const {
         throw std::out_of_range("Index out of bounce");
     }   
 
-    if (i > k) {
-        std::swap(i, k);
-    }
-
     return data[i][k];
 };
 
@@ -32,16 +28,17 @@ void DistanceMatrix::Set(size_t i, size_t k, double val) {
         throw std::out_of_range("Index out of bounce");
     }   
 
-    if (i > k) {
-        std::swap(i, k);
-    }
-
     data[i][k] = val;
+    data[k][i] = val;
 };
 
 size_t DistanceMatrix::GetDim() const {
     return N;
 };
+
+std::vector<std::vector<double>> DistanceMatrix::GetData() const {
+    return data;
+}
 
 void DistanceMatrix::Print() const {
 
