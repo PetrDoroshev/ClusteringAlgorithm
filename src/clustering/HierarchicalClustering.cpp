@@ -10,7 +10,7 @@ HClustering::HClustering(const std::vector<DataPoint>& dataset, MetricType dista
         
         initDistanceMatrix();
 
-        clusterSize = std::vector<size_t> (2 * dataset.size() - 1, 0);
+        clusterSize = std::vector<size_t> (dataset.size(), 0);
         for (size_t i = 0; i < dataset.size(); ++i) {
             clusterSize[i] = 1;
         }
@@ -29,7 +29,7 @@ DistanceMatrix HClustering::getDM() const {
 
 void HClustering::initDistanceMatrix() {
 
-    DM = DistanceMatrix(2 * dataset.size() - 1);
+    DM = DistanceMatrix(dataset.size());
 
     for (size_t i = 0; i < dataset.size(); ++i) {
         for (size_t k = i + 1; k < dataset.size(); ++k){
@@ -54,12 +54,6 @@ std::vector<std::tuple<size_t, size_t, double, int>> HClustering::Fit() {
     std::vector<std::tuple<size_t, size_t, double, int>> linkage_matrix;
     linkage_matrix.reserve(L.size());
 
-    /*
-    for (auto& r: L) {
-        std::cout << r.left << ", " << r.right << ", " << r.order << "\n";
-    }
-    */
-
     std::cout << "\n";
     for (auto& [a, b, d, size]: L) {
 
@@ -73,9 +67,11 @@ std::vector<std::tuple<size_t, size_t, double, int>> HClustering::Fit() {
         U.Union(a, b);
     }
 
+    /*
     for (auto&[a, b, d, size]: linkage_matrix) {
          std::cout << a << ", " << b << ", " << d << "\n";
     }
+    */
 
     return linkage_matrix;
 };
