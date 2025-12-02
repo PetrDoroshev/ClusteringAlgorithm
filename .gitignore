@@ -1,3 +1,7 @@
 build
 1109.2378v1.pdf
 .vscode/settings.json
+
+*.lock
+*.so
+*.python-version

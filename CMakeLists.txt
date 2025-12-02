@@ -20,3 +20,8 @@ set_target_properties(ClusteringAlgorithm PROPERTIES POSITION_INDEPENDENT_CODE O
 
 pybind11_add_module(clustering src/main.cpp)
 target_link_libraries(clustering PRIVATE ClusteringAlgorithm)
+
+set_target_properties(clustering PROPERTIES
+	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_proj
+	PREFIX ""
+)
