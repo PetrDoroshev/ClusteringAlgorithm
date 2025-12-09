@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Классификация</title>
+		<link rel="stylesheet" href="/static/style.css">
+		<script src="/static/script.js"></script>
+		<script src='https://cdn.plot.ly/plotly-3.3.0.min.js'></script>
+	</head>
+
+	<body>
+		<h1>Классификация</h1>
+		<button onclick="switchMode('edit')">Edit Mode</button>
+		<button onclick="switchMode('plot')">Plot Mode</button>
+		<button onclick="classify()">Classify</button>
+
+		<div id="mode-edit">
+			<h2>Edit Mode</h2>
+			<table border="1" id="data-table"></table>
+			<button onclick="addRow()">Add Row</button>
+			<button onclick="addCol()">Add Column</button>
+		</div>
+
+		<div id="mode-plot">
+			<h2>Plot Mode</h2>
+			<label>X: <select id="x-col"></select></label>
+			<label>Y: <select id="y-col"></select></label>
+			<button onclick="drawPlot()">Draw</button>
+			<div class="plot-class" id="plot"></div>
+		</div>
+	</body>
+</html>

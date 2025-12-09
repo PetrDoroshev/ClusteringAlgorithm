@@ -5,3 +5,4 @@ build
 *.lock
 *.so
 *.python-version
+__pycache__
