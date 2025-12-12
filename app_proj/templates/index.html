@@ -13,6 +13,13 @@
 		<button onclick="switchMode('edit')">Edit Mode</button>
 		<button onclick="switchMode('plot')">Plot Mode</button>
 		<button onclick="classify()">Classify</button>
+		<label>Mode
+			<select id="classify-mode">
+				<option value="max_clusters">Max clusters</option>
+				<option value="distance">Distance</option>
+			</select>
+		</label>
+		<input id="classify-param-value" type="number" value=4>
 
 		<div id="mode-edit">
 			<h2>Edit Mode</h2>

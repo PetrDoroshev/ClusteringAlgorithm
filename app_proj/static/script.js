@@ -54,6 +54,12 @@ async function updateCell(id, dim, value) {
 			"col_id": dim,
 			"new_val": value,
 		}),
+	})
+	.then(response => {
+		if (!response.ok) {
+			alert("ERROR WHILE PARSING CONTENT")
+			return
+		}
 	});
 }
 
@@ -74,8 +80,33 @@ async function addCol() {
 }
 
 async function classify() {
-	await fetch("/classify")
+	let chosed_mode = document.getElementById("classify-mode");
+	let max_clusters = null;
+	let distance = null;
 
+	let param_value = document.getElementById("classify-param-value").value;
+	if (chosed_mode.value === "max_clusters") {
+		if (parseInt(param_value) === param_value) {
+			alert("Param is float, int expected");
+			return;
+		}
+		max_clusters = param_value;
+	} else {
+		distance = param_value;
+	};
+
+	await fetch("/classify", {
+		method: "POST",
+		headers: {"Content-Type": "application/json"},
+		body: JSON.stringify({
+			"max_clusters": max_clusters,
+			"distance": distance,
+		})
+	})
+
+	if (document.getElementById("mode-plot").style.display === 'block') {
+		drawPlot()
+	}
 }
 
 function updateColumnSelectors(dims) {
@@ -103,7 +134,7 @@ async function drawPlot() {
 	let x = data.map(r => r.data_vector[xDim])
 	let y = data.map(r => r.data_vector[yDim])
 
-	let cls = data.map(r => r.class ?? -1);
+	let cls = data.map(r => r.row_class ?? -1);
 
 	let trace = {
 		x: x,
