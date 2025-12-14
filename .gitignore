@@ -2,6 +2,8 @@ build
 1109.2378v1.pdf
 .vscode/settings.json
 
+app_proj/dynamic/dend.png
+
 *.lock
 *.so
 *.python-version

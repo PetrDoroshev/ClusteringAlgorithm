@@ -4,20 +4,37 @@ except ImportError as e:
     print("ERROR: Build clustering first!!!!, see README.md")
     raise e
 
+import os
 from typing import List, Dict, Any, Optional
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 from pydantic import BaseModel
+import scipy
 from scipy.cluster.hierarchy import fcluster
+import matplotlib.pyplot as plt
 
 from clustering import HClustering, MetricType, LinkageType, DataPoint
 
+dendrogram_resolver = FastAPI()
+
+@dendrogram_resolver.get("/{image_path:path}")
+async def dendrogram_resolve(image_path: str):
+    file_path = os.path.join("./dynamic/", image_path)
+    if not os.path.exists(file_path):
+        return Response(status_code=404)
+
+    with open(file_path, "rb") as f:
+        image_bytes = f.read()
+
+    return Response(content=image_bytes, media_type="image/png")
+
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/dynamic", dendrogram_resolver)
 templates = Jinja2Templates(directory='templates')
 
 class RowData(BaseModel):
@@ -34,7 +51,6 @@ class RowData(BaseModel):
 
 class SaveData(BaseModel):
     rows: List[RowData]
-
 
 test_data = [
     [0., 0.], [0., 1.], [1., 0.],
@@ -117,3 +133,8 @@ async def classify(request: ClassificationParams):
 
     for (now_row_id, now_row) in enumerate(data.rows):
         now_row.row_class = labels[now_row_id]
+
+    _ = scipy.cluster.hierarchy.dendrogram(result)
+    plt.savefig('./dynamic/dend.png', dpi=300, transparent=False, bbox_inches='tight')
+
+

@@ -2,38 +2,55 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Классификация</title>
+		<title>Classification</title>
 		<link rel="stylesheet" href="/static/style.css">
+		<link href="https://cdn.jsdelivr.net/npm/lightgallery@2.9.0/css/lightgallery-bundle.min.css" rel="stylesheet">
 		<script src="/static/script.js"></script>
 		<script src='https://cdn.plot.ly/plotly-3.3.0.min.js'></script>
+		<script src="https://cdn.jsdelivr.net/npm/lightgallery@2.9.0/lightgallery.umd.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lightgallery@2.9.0/plugins/zoom/lg-zoom.umd.js"></script>
 	</head>
 
 	<body>
-		<h1>Классификация</h1>
-		<button onclick="switchMode('edit')">Edit Mode</button>
-		<button onclick="switchMode('plot')">Plot Mode</button>
-		<button onclick="classify()">Classify</button>
-		<label>Mode
-			<select id="classify-mode">
-				<option value="max_clusters">Max clusters</option>
-				<option value="distance">Distance</option>
-			</select>
-		</label>
-		<input id="classify-param-value" type="number" value=4>
-
-		<div id="mode-edit">
-			<h2>Edit Mode</h2>
-			<table border="1" id="data-table"></table>
-			<button onclick="addRow()">Add Row</button>
-			<button onclick="addCol()">Add Column</button>
+		<h1>Classification</h1>
+		<div class="header">
+			<button onclick="switchMode('edit')" class="mode-button">Edit Mode</button>
+			<button onclick="switchMode('plot')" class="mode-button">Plot Mode</button>
+			<button onclick="switchMode('dend')" class="mode-button">Dendrogram Mode</button>
+			<button onclick="classify()" class="classify-button">Classify</button>
+			<label>Mode
+				<select id="classify-mode" class="classify-select">
+					<option value="max-clusters">Max clusters</option>
+					<option value="distance">Distance</option>
+				</select>
+			</label>
+			<input id="classify-param-value" type="number" value=4 class="classify-value">
 		</div>
 
-		<div id="mode-plot">
-			<h2>Plot Mode</h2>
-			<label>X: <select id="x-col"></select></label>
-			<label>Y: <select id="y-col"></select></label>
-			<button onclick="drawPlot()">Draw</button>
+		<div id="mode-edit" class="edit-content">
+			<h2 class="mode-header">Edit Mode</h2>
+			<div class="edit-buttons">
+				<button onclick="addRow()" class="table-button">Add Row</button>
+				<button onclick="addCol()" class="table-button">Add Column</button>
+			</div>
+			<table border="1" id="data-table" class="table"></table>
+		</div>
+
+		<div id="mode-plot" class="plot-mode">
+			<h2 class="mode-header">Plot Mode</h2>
+			<label class="plot-select">X: <select id="x-col"></select></label>
+			<label class="plot-select">Y: <select id="y-col"></select></label>
+			<button onclick="drawPlot()" class="plot-button">Draw</button>
 			<div class="plot-class" id="plot"></div>
+		</div>
+
+		<div id="mode-dend" class="dend-mode">
+			<h2 class="mode-header">Dendrogram Mode</h2>
+			<div id="lightgallery">
+				<a href="dynamic/dend.png">
+					<img src="dynamic/dend.png" width="600" onclick="openImage()"></img>
+				</a>
+			</div>
 		</div>
 	</body>
 </html>

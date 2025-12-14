@@ -2,13 +2,20 @@ window.onload = function() {
 	switchMode("edit");
 }
 
+let xChooseValue = 0;
+let yChooseValue = 1;
+
 function switchMode(mode) {
+	document.getElementById("mode-plot").style.display = "none";
+	document.getElementById("mode-edit").style.display = "none";
+	document.getElementById("mode-dend").style.display = "none";
+
 	if (mode === "edit") {
 		document.getElementById("mode-edit").style.display = "block";
-		document.getElementById("mode-plot").style.display = "none";
-	} else {
+	} else if (mode === "plot") {
 		document.getElementById("mode-plot").style.display = "block";
-		document.getElementById("mode-edit").style.display = "none";
+	} else {
+		document.getElementById("mode-dend").style.display = "block";
 	}
 	loadData();
 }
@@ -29,18 +36,21 @@ function renderTable(rows) {
 	let dims = rows[0].data_vector.length
 
 	let header = "<tr><th>ID</th>";
+	header += "<th>Class</th>";
 	for (let i = 0; i < dims; i++) header += `<th>Dim ${i+1}</th>`;
-	header += "<th>Class</th></tr>";
+	header += "</tr>";
 	tbl.innerHTML += header;
 
 	for (let r of rows) {
 		let tr = `<tr data-id="${r.row_id}"><td>${r.row_id}</td>`;
 
+		tr += `<td>${r.row_class ?? ""}</td>`;
+
 		for (let i = 0; i < dims; i++) {
 			let val = r.data_vector[i];
 			tr += `<td><input type="number" value="${val}" onchange="updateCell(${r.row_id}, ${i}, this.value)" /></td>`;
 		}
-		tr += `<td>${r.row_class ?? ""}</td></tr>`;
+		tr += `</tr>`;
 		tbl.innerHTML += tr;
 	}
 }
@@ -85,11 +95,7 @@ async function classify() {
 	let distance = null;
 
 	let param_value = document.getElementById("classify-param-value").value;
-	if (chosed_mode.value === "max_clusters") {
-		if (parseInt(param_value) === param_value) {
-			alert("Param is float, int expected");
-			return;
-		}
+	if (chosed_mode.value === "max-clusters") {
 		max_clusters = param_value;
 	} else {
 		distance = param_value;
@@ -105,7 +111,11 @@ async function classify() {
 	})
 
 	if (document.getElementById("mode-plot").style.display === 'block') {
-		drawPlot()
+		drawPlot();
+	}
+	if (document.getElementById("mode-edit").style.display === 'block') {
+		loadData();
+		renderTable();
 	}
 }
 
@@ -119,8 +129,17 @@ function updateColumnSelectors(dims) {
 	ySel.innerHTML = "";
 
 	for (let i = 0; i < dims; i++) {
-		xSel.innerHTML += `<option value="${i}">Dim ${i}</option>`
-		ySel.innerHTML += `<option value="${i}">Dim ${i}</option>`
+		if (i === xChooseValue) {
+			xSel.innerHTML += `<option selected="selected" value="${i}">Dim ${i}</option>`;
+		} else {
+			xSel.innerHTML += `<option value="${i}">Dim ${i}</option>`;
+		};
+
+		if (i === yChooseValue) {
+			ySel.innerHTML += `<option selected="selected" value="${i}">Dim ${i}</option>`;
+		} else {
+			ySel.innerHTML += `<option value="${i}">Dim ${i}</option>`;
+		};
 	}
 }
 
@@ -130,6 +149,9 @@ async function drawPlot() {
 
 	let xDim = parseInt(document.getElementById("x-col").value) ?? 0;
 	let yDim = parseInt(document.getElementById("y-col").value) ?? 1;
+
+	xChooseValue = xDim;
+	yChooseValue = yDim;
 
 	let x = data.map(r => r.data_vector[xDim])
 	let y = data.map(r => r.data_vector[yDim])
@@ -145,4 +167,14 @@ async function drawPlot() {
 	};
 
 	Plotly.newPlot("plot", [trace], {title: "Scatter Plor"});
+}
+
+function openImage() {
+	lightGallery(document.getElementById('lightgallery'), {
+		plugins: [lgZoom],
+		speed: 500,
+		download: true,
+		backgroundColor: "#FFFFFF",
+		infiniteZoom: true,
+	});
 }

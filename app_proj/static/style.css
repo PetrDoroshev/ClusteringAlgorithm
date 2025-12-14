@@ -1,8 +1,169 @@
-h1 {
-	color: cyan;
+* {
+    box-sizing: border-box;
 }
 
-.plot-class {
-	width: 600px;
-	height: 600px;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #e9edf2;
+    color: #222;
 }
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-weight: 400;
+}
+
+.header,
+.table-edit-mode,
+.plot-mode {
+    background: #ffffff;
+    max-width: 1000px;
+    margin: 16px auto;
+    padding: 16px 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mode-button,
+.classify-button,
+.table-button,
+.plot-button {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #5b7c99;
+    background: #f5f8fb;
+    color: #2b4a64;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.mode-button:hover,
+.classify-button:hover,
+.table-button:hover,
+.plot-button:hover {
+    background: #5b7c99;
+    color: #ffffff;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.classify-value,
+#x-col,
+#y-col {
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: 1px solid #5b7c99;
+    background: #ffffff;
+    width: 90px;
+}
+
+.classify-select {
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: 1px solid #5b7c99;
+    background: #ffffff;
+    width: 160px;
+}
+
+.mode-header {
+    margin-top: 0;
+    text-align: center;
+    font-weight: 400;
+}
+
+.table {
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.table td,
+.table th {
+    padding: 3px 5px;
+    min-width: 40px;
+    max-width: 70px;
+    height: 28px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.1;
+    border: 1px solid #cfd6dd;
+}
+
+.table th {
+    background: #edf2f7;
+    font-weight: 500;
+}
+
+.table tr:nth-child(even) td {
+    background: #f7f9fc;
+}
+
+.table input {
+    width: 100%;
+    height: 22px;
+    padding: 2px 4px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #cfd6dd;
+}
+
+.plot-mode {
+    display: flex;
+    flex-direction: column;
+}
+
+.plot-mode > label,
+.plot-mode > button {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.edit-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.table {
+    margin: 0 auto;
+}
+
+.dend-mode {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+#lightgallery {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%
+	margin-top: 20px;
+}
+
