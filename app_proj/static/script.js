@@ -4,6 +4,8 @@ window.onload = function() {
 
 let xChooseValue = 0;
 let yChooseValue = 1;
+let selectedRow = null;
+let selectedCol = null;
 
 function switchMode(mode) {
 	document.getElementById("mode-plot").style.display = "none";
@@ -27,6 +29,47 @@ async function loadData() {
 	renderTable(data);
 }
 
+function selectRow(row_id) {
+	if (selectedRow != null) {
+		[...document.querySelectorAll("#data-table tr")].forEach(tr => {
+			tr.classList.remove("selected-row", tr.dataset.id == selectedRow);
+		});
+	}
+	if (selectedRow === row_id) {
+		selectedRow = null;
+	} else {
+		selectedRow = row_id;
+		[...document.querySelectorAll("#data-table tr")].forEach(tr => {
+			tr.classList.toggle("selected-row", tr.dataset.id == selectedRow);
+		});
+	}
+}
+
+function selectCol(col_id) {
+	if (selectedCol != null) {
+		let nowSelectedColId = `Col${selectedCol}`;
+		[...document.querySelectorAll("#data-table td")].forEach(td => {
+			if (td.id === nowSelectedColId) {
+				td.classList.remove("selected-col");
+			}
+		});
+	}
+	if (selectedCol === col_id) {
+		selectedCol = null;
+	} else {
+		selectedCol = col_id;
+		let nowSelectedColId = `Col${selectedCol}`;
+		console.log("SELECT");
+		console.log(nowSelectedColId);
+		[...document.querySelectorAll("#data-table td")].forEach(td => {
+			console.log(td.id);
+			if (td.id === nowSelectedColId) {
+				td.classList.toggle("selected-col");
+			}
+		});
+	}
+}
+
 function renderTable(rows) {
 	let tbl = document.getElementById("data-table");
 	tbl.innerHTML = "";
@@ -37,18 +80,19 @@ function renderTable(rows) {
 
 	let header = "<tr><th>ID</th>";
 	header += "<th>Class</th>";
-	for (let i = 0; i < dims; i++) header += `<th>Dim ${i+1}</th>`;
+	for (let i = 0; i < dims; i++) header += `<th onClick="selectCol(${i})">Dim ${i+1}</th>`;
 	header += "</tr>";
 	tbl.innerHTML += header;
 
 	for (let r of rows) {
-		let tr = `<tr data-id="${r.row_id}"><td>${r.row_id}</td>`;
+		let tr = document.createElement("tr");
+		tr = `<tr data-id="${r.row_id}"><td onClick="selectRow(${r.row_id})">${r.row_id}</td>`;
 
 		tr += `<td>${r.row_class ?? ""}</td>`;
 
 		for (let i = 0; i < dims; i++) {
 			let val = r.data_vector[i];
-			tr += `<td><input type="number" value="${val}" onchange="updateCell(${r.row_id}, ${i}, this.value)" /></td>`;
+			tr += `<td id=Col${i}><input type="number" value="${val}" onchange="updateCell(${r.row_id}, ${i}, this.value)" /></td>`;
 		}
 		tr += `</tr>`;
 		tbl.innerHTML += tr;
@@ -88,6 +132,7 @@ async function addCol() {
 	});
 	loadData();
 }
+
 
 async function classify() {
 	let chosed_mode = document.getElementById("classify-mode");
@@ -177,4 +222,30 @@ function openImage() {
 		backgroundColor: "#FFFFFF",
 		infiniteZoom: true,
 	});
+}
+
+async function removeSelectedRow() {
+	if (selectedRow != null) {
+		await fetch("/remove_row", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				"id_to_remove": selectedRow,
+			})
+		})
+		loadData();
+	}
+}
+
+async function removeSelectedCol() {
+	if (selectedCol != null) {
+		await fetch("/remove_col", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				"id_to_remove": selectedCol,
+			})
+		})
+		loadData();
+	}
 }

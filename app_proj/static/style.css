@@ -167,3 +167,7 @@ label {
 	margin-top: 20px;
 }
 
+.selected-row,
+.selected-col {
+	background-color: #ffe6b3;
+}

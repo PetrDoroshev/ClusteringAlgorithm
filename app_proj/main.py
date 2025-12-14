@@ -137,4 +137,33 @@ async def classify(request: ClassificationParams):
     _ = scipy.cluster.hierarchy.dendrogram(result)
     plt.savefig('./dynamic/dend.png', dpi=300, transparent=False, bbox_inches='tight')
 
+class RemoveSelected(BaseModel):
+    id_to_remove: int
 
+@app.post('/remove_row')
+async def remove_row(request: RemoveSelected):
+    row_to_remove = request.id_to_remove
+
+    if row_to_remove >= len(data.rows):
+        raise HTTPException(status_code=400, detail="Trying to remove row that do not exists")
+
+    if len(data.rows) <= 2:
+        raise HTTPException(status_code=400, detail="Data should contain at least 2 rows")
+
+    _ = data.rows.pop(row_to_remove)
+
+    for new_row_id, now_row in enumerate(data.rows):
+        now_row.row_id = new_row_id
+
+@app.post('/remove_col')
+async def remove_col(request: RemoveSelected):
+    col_to_remove = request.id_to_remove
+
+    if col_to_remove >= len(data.rows[0].data_vector):
+        raise HTTPException(status_code=400, detail="Trying to remove col that do not exists")
+
+    if len(data.rows[0].data_vector) <= 2:
+        raise HTTPException(status_code=400, detail="Data should contain at least 2 cols")
+
+    for now_row in data.rows:
+        _ = now_row.data_vector.pop(col_to_remove)
