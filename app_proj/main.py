@@ -136,6 +136,7 @@ async def classify(request: ClassificationParams):
 
     _ = scipy.cluster.hierarchy.dendrogram(result)
     plt.savefig('./dynamic/dend.png', dpi=300, transparent=False, bbox_inches='tight')
+    plt.close("all")
 
 class RemoveSelected(BaseModel):
     id_to_remove: int

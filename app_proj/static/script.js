@@ -16,8 +16,11 @@ function switchMode(mode) {
 		document.getElementById("mode-edit").style.display = "block";
 	} else if (mode === "plot") {
 		document.getElementById("mode-plot").style.display = "block";
+		drawPlot();
 	} else {
 		document.getElementById("mode-dend").style.display = "block";
+		const img = document.getElementById("dend-image");
+		img.src = "dynamic/dend.png?t=" + new Date().getTime();
 	}
 	loadData();
 }
@@ -59,10 +62,7 @@ function selectCol(col_id) {
 	} else {
 		selectedCol = col_id;
 		let nowSelectedColId = `Col${selectedCol}`;
-		console.log("SELECT");
-		console.log(nowSelectedColId);
 		[...document.querySelectorAll("#data-table td")].forEach(td => {
-			console.log(td.id);
 			if (td.id === nowSelectedColId) {
 				td.classList.toggle("selected-col");
 			}
@@ -157,10 +157,11 @@ async function classify() {
 
 	if (document.getElementById("mode-plot").style.display === 'block') {
 		drawPlot();
-	}
-	if (document.getElementById("mode-edit").style.display === 'block') {
+	} else if (document.getElementById("mode-edit").style.display === 'block') {
 		loadData();
 		renderTable();
+	} else if (document.getElementById("mode-dend").style.display === 'block') {
+		switchMode("dend");
 	}
 }
 
