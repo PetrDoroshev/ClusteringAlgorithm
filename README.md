@@ -1,3 +1,6 @@
+## ClusteringAlgorithm
+An implementation of hierarchical clustering using the nearest neighbor chain algorithm. It consists of a C++ library and a Python web application for demonstration.
+
 ## Build clustering
 1. ```mkdir -p build```
 2. ```cd build```
